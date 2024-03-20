@@ -6,9 +6,11 @@ import Home from "../pages/Home"
 import { RockForm } from "./RockForm.jsx"
 import { RockList } from "./RockList.jsx"
 import { Register } from "../pages/Register.jsx"
+import { UserRockList } from "./UserRockList.jsx"
 
 export const ApplicationViews = () => {
   const [rocksState, setRocksState] = useState([])
+  const [ownerRocksState, setOwnerRocksState] = useState([])
 
   const fetchRocksFromAPI = async () => {
     const response = await fetch("http://localhost:8000/rocks", {
@@ -22,6 +24,17 @@ export const ApplicationViews = () => {
     setRocksState(rocks)
   }
 
+  const fetchOwnerRocksFromAPI = async () => {
+    const response = await fetch(`http://localhost:8000/rocks?owner=current`, {
+      headers: {
+        Authorization: `Token ${
+          JSON.parse(localStorage.getItem("rock_token")).token
+        }`,
+      },
+    })
+    const rocks = await response.json()
+    setOwnerRocksState(rocks)
+  }
   return (
     <BrowserRouter>
       <Routes>
@@ -42,7 +55,10 @@ export const ApplicationViews = () => {
           <Route
             path="/mine"
             element={
-              <RockList rocks={rocksState} fetchRocks={fetchRocksFromAPI} />
+              <UserRockList
+                rocks={ownerRocksState}
+                fetchOwnerRocks={fetchOwnerRocksFromAPI}
+              />
             }
           />
         </Route>
